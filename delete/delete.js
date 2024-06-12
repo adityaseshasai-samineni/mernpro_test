@@ -67,6 +67,35 @@ router.post("/deleteCart", (req, res) => {
     	}
 	})
 })
+router.post("/deleteUser", (req, res) => {
+	let obj = {
+    	"userid": req.body.userid,
+    	"u_name": req.body.u_name,
+	}
+	//connect to mongodb
+    mcl.connect(url, (err, conn) => {
+    	if (err)
+            console.log('Error in connection :- ', err)
+    	else {
+        	let db = conn.db(dbName)
+            db.collection('users').deleteOne(obj, (err, result) => {
+                if (err)
+                    res.json({ 'userDelete': 'Error ' + err })
+                else {
+                    if (result.deletedCount != 0) {
+                    	console.log(`user data from ${obj.u_name} deleted`)
+                    	res.json({ 'userDelete': 'success' })
+                    }
+                    else {
+                    	console.log('User Data Not deleted')
+                    	res.json({ 'userDelete': 'Record Not found' })
+                    }
+                    conn.close()
+                }
+            })
+    	}
+	})
+})
 
 //export router
 module.exports = router
